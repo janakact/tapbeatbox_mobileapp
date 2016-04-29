@@ -8,6 +8,120 @@
     mc:Ignorable="d">
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        
+        
+        <!--Slot Settings-->
+        <Popup  x:Name="SlotSettings" IsOpen="False" HorizontalAlignment="Stretch" >
+            
+                <Border x:Name="SlotSettingsBorder" BorderBrush="{StaticResource ApplicationForegroundThemeBrush}" 
+                Background="{StaticResource ApplicationPageBackgroundThemeBrush}"
+                BorderThickness="2" HorizontalAlignment="Stretch">
+                    <StackPanel  VerticalAlignment="Center" HorizontalAlignment="Stretch">
+                    <TextBox Name="SlotSettings_Name" HorizontalAlignment="Center"></TextBox>
+
+                        <!--Tone-->
+                    <ComboBox x:Name="SlotSettings_Tone" Header="Tone" Height="64" Width="{Binding AppWidth}"  HorizontalAlignment="Center"
+          ItemsSource="{x:Bind listOfToneNames}" />
+
+                        <!--Volume-->
+                    <ComboBox x:Name="SlotSettings_Volume" Header="Volume" Height="64" HorizontalAlignment="Center"
+          ItemsSource="{x:Bind listOfVolumes}" />
+
+                    <Button Content="Save" Click="SaveSlotSettings" HorizontalAlignment="Center" />
+                        
+                    <Button Content="Train" Click="StartTraining" HorizontalAlignment="Center" />
+                </StackPanel>
+                </Border>
+        </Popup>
+        
+        
+
+
+        <!--Training Page-->
+        <Popup  x:Name="TrainPage" IsOpen="False" HorizontalAlignment="Stretch" >
+
+            <Border x:Name="TrainPageBorder" BorderBrush="{StaticResource ApplicationForegroundThemeBrush}" 
+                Background="{StaticResource ApplicationPageBackgroundThemeBrush}"
+                BorderThickness="2" HorizontalAlignment="Stretch">
+                <StackPanel  VerticalAlignment="Center" HorizontalAlignment="Stretch">
+                    <TextBlock Text="Training"></TextBlock>
+                    <ProgressBar Height="30" Value="20" x:Name="TrainingPage_Progress"></ProgressBar>
+                    <Button Content="Cancel" Click="CancelTraining" HorizontalAlignment="Center" />
+                </StackPanel>
+            </Border>
+        </Popup>
+
+        <!--Play Page-->
+        <Popup  x:Name="PlayPage" IsOpen="False" HorizontalAlignment="Stretch" >
+            <Border x:Name="PlayPageBorder" BorderBrush="{StaticResource ApplicationForegroundThemeBrush}" 
+                Background="{StaticResource ApplicationPageBackgroundThemeBrush}"
+                BorderThickness="2" HorizontalAlignment="Stretch">
+                <StackPanel  VerticalAlignment="Center" HorizontalAlignment="Stretch">
+                    <TextBlock Text="Tap to the device and play"></TextBlock>
+                    <Button Content="Cancel" Click="CancelPlaying" HorizontalAlignment="Center" />
+                </StackPanel>
+            </Border>
+        </Popup>
+
+        <!--Settings Page-->
+        <Popup  x:Name="SettingsPage" IsOpen="False" HorizontalAlignment="Stretch" >
+            <Border x:Name="SettingsPageBorder" BorderBrush="{StaticResource ApplicationForegroundThemeBrush}" 
+                Background="{StaticResource ApplicationPageBackgroundThemeBrush}"
+                BorderThickness="2" HorizontalAlignment="Stretch">
+                <StackPanel  VerticalAlignment="Center" HorizontalAlignment="Stretch">
+                    <TextBlock Text="Settings"></TextBlock>
+                    <CheckBox x:Name="Settings_IsShareData" Content="Share Collected data for further development of the application"></CheckBox>
+                    <ComboBox x:Name="Settings_MasterVolume" Header="Master Volume" Height="64" HorizontalAlignment="Center"
+          ItemsSource="{x:Bind listOfVolumes}" />
+                    
+                    <Button Content="Save" Click="CloseSettings" HorizontalAlignment="Center" />
+                    
+                </StackPanel>
+            </Border>
+        </Popup>
+
+
+
+        <!--Button list-->
+        <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="67*"/>
+                <ColumnDefinition Width="67*"/>
+                <ColumnDefinition Width="67*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="100"></RowDefinition>
+            </Grid.RowDefinitions>
+
+            <Button Grid.Column="0" Grid.Row="0" Height="30" HorizontalAlignment="Stretch"  Margin="10" Content="Play" Click="StartPlaying"></Button>
+            <Button Grid.Column="1" Grid.Row="0" Height="30" HorizontalAlignment="Stretch" Margin="10" Content="Settings" Click="OpenSettings"></Button>
+            <Button Grid.Column="2" Grid.Row="0" Height="30" HorizontalAlignment="Stretch" Margin="10" Content="Add Slot"></Button>
+        </Grid>
+
+        <!--Slot List-->
+        <TextBlock x:Name="AppTitle" TextWrapping="NoWrap"  HorizontalAlignment="Right"/>
+        <ListView x:Name="SlotList" VerticalAlignment="Bottom" ItemClick="OpenSlotSettings" IsItemClickEnabled="True" IsMultiSelectCheckBoxEnabled="True">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <Grid Height="60" Margin="6">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="50"/>
+                            <ColumnDefinition Width="50"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Border Width="60" Height="110">
+                            <Image Stretch="UniformToFill" Source="Assets/StoreLogo.png"/>
+                        </Border>
+                        <TextBlock Grid.Column="2" Text="{Binding Name}"  TextWrapping="NoWrap"/>
+                        <TextBlock Grid.Column="3" Text="{Binding Volume}"  TextWrapping="NoWrap"/>
+                        <TextBlock Grid.Column="4" Text="{Binding ToneName}"  MaxHeight="60"/>
+                    </Grid>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+
+ 
 
     </Grid>
 </Page>

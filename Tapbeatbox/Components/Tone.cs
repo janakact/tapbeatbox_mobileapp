@@ -4,9 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Tapbeatbox.TapLibrary
+namespace Tapbeatbox
 {
-    class Slot
+    class Tone
     {
+        public string name { get; set; }
+        public string source { get; set; }
     }
 }

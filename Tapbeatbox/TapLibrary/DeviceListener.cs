@@ -10,7 +10,7 @@ namespace Tapbeatbox.TapLibrary
 {
     class DeviceListener
     {
-        private List<Slot> slots;
+        //private List<Slot> slots;
         private DeviceListener()
         { }
 
