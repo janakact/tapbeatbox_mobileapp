@@ -45,7 +45,8 @@
                 BorderThickness="2" HorizontalAlignment="Stretch">
                 <StackPanel  VerticalAlignment="Center" HorizontalAlignment="Stretch">
                     <TextBlock Text="Training"></TextBlock>
-                    <ProgressBar Height="30" Value="20" x:Name="TrainingPage_Progress"></ProgressBar>
+                    <ProgressBar Height="30" Minimum="0" Maximum="10"  x:Name="TrainingPage_Progress"></ProgressBar>
+                    <TextBlock x:Name="AccReading"></TextBlock>
                     <Button Content="Cancel" Click="CancelTraining" HorizontalAlignment="Center" />
                 </StackPanel>
             </Border>

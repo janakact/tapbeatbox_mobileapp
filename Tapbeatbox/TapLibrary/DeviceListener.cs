@@ -11,8 +11,15 @@ namespace Tapbeatbox.TapLibrary
     class DeviceListener
     {
         //private List<Slot> slots;
+        Sensor sensor;
+        
+        double lastValue = 0;
+        DateTime lastTime ;
         private DeviceListener()
-        { }
+        {
+            sensor = new AccelerometerSensor();
+            lastTime =  DateTime.Now;
+        }
 
         public static DeviceListener getInstance()
         {
@@ -45,8 +52,18 @@ namespace Tapbeatbox.TapLibrary
         {
             while (true)
             {
-                TapEventArgs e = new TapEventArgs(1, 1);
-                OnTap(this, e);
+                double[] readings = sensor.getReadings();
+
+                double sum = readings[0] * readings[0] + readings[1] * readings[1] + readings[2] * readings[2];
+                if(Math.Abs(lastValue - sum) > Constant.valueGap && (DateTime.Now-lastTime)>Constant.timeGap)
+                {
+                    TapEventArgs e = new TapEventArgs(1, 1);
+                    OnTap(this, e);
+                    lastTime = DateTime.Now;
+                    System.Diagnostics.Debug.WriteLine(lastValue-sum);
+                }
+                System.Diagnostics.Debug.WriteLine(lastValue - sum);
+                lastValue = sum;
             }
         }
     }

@@ -104,8 +104,11 @@
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TapLibrary\Accelerometer.cs" />
     <Compile Include="TapLibrary\DeviceListener.cs" />
-    <Compile Include="Components\Slot.cs" />
+    <Compile Include="Components\ToneSlot.cs" />
+    <Compile Include="TapLibrary\Sensor.cs" />
+    <Compile Include="TapLibrary\Slot.cs" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">

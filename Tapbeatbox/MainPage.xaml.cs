@@ -14,6 +14,7 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using Tapbeatbox.TapLibrary;
 
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
@@ -25,7 +26,7 @@ namespace Tapbeatbox
     /// </summary>
     public sealed partial class MainPage : Page
     {
-        private List<Slot> listOfSlots = new List<Slot>();
+        private List<ToneSlot> listOfSlots = new List<ToneSlot>();
         private List<string> listOfToneNames = new List<string>();
         private List<int> listOfVolumes= new List<int>();
 
@@ -42,6 +43,12 @@ namespace Tapbeatbox
         int MasterVolume = 0;
         bool IsShareData = true;
 
+        private DeviceListener deviceListener;
+        private int TrainingProgressValue;
+
+
+        DispatcherTimer dispatcherTimer;
+
         public MainPage()
         {
             this.InitializeComponent();
@@ -57,14 +64,16 @@ namespace Tapbeatbox
                 listOfVolumes.Add(i);
             }
 
-            
+            System.Diagnostics.Debug.WriteLine("Starting the app.");
+
+
 
             //Load User Data
             dynamic a = localSettings.Values["SlotCount"];
             int slotCount = (a == null) ? 0 : (int)a;
             for (int i=0; i< slotCount; i++)
             {
-                Slot s = LoadSlotItem(i);
+                ToneSlot s = LoadSlotItem(i);
                 if (s != null) listOfSlots.Add(s);
             }
             dynamic isShareData = localSettings.Values["IsShareData"];
@@ -78,7 +87,7 @@ namespace Tapbeatbox
             {
                 for (int i = 0; i < 3; i++)
                 {
-                    listOfSlots.Add(new Slot { ID = i, Name = "Slot" + i, Volume = Constant.defaultVolume, ToneName = listOfToneNames[0] });
+                    listOfSlots.Add(new ToneSlot { ID = i, Name = "Slot" + i, Volume = Constant.defaultVolume, ToneName = listOfToneNames[0] });
                     SaveSlotItem(i);
                 }
             }
@@ -89,8 +98,12 @@ namespace Tapbeatbox
 
             //Get Window size
             SetComponentSizes();
-            
 
+
+            //Make the listener module
+            deviceListener = DeviceListener.getInstance();
+            deviceListener.OnTap += OnTap;
+            DispatcherTimerSetup();
 
         }
 
@@ -122,7 +135,7 @@ namespace Tapbeatbox
         // Handles the Click event on the Solts on the page and opens the Popup. 
         private void OpenSlotSettings(object sender, ItemClickEventArgs e)
         {
-            Slot s = e.ClickedItem as Slot;
+            ToneSlot s = e.ClickedItem as ToneSlot;
 
             SlotSettings_Name.Text = s.Name;
             SlotSettings_Tone.SelectedItem = s.ToneName;
@@ -138,6 +151,10 @@ namespace Tapbeatbox
         public void StartTraining(object sender, RoutedEventArgs e)
         {
             if (!TrainPage.IsOpen) { TrainPage.IsOpen = true; }
+
+            TrainingProgressValue = 0;
+            //Start the traing thread;
+            deviceListener.run();
         }
         public void CancelTraining(object sender, RoutedEventArgs e)
         {
@@ -185,7 +202,7 @@ namespace Tapbeatbox
             Windows.Storage.ApplicationDataCompositeValue composite =
      new Windows.Storage.ApplicationDataCompositeValue();
 
-            Slot slot = listOfSlots[index];
+            ToneSlot slot = listOfSlots[index];
             composite["ID"] = slot.ID;
             composite["Name"] = slot.Name;
             composite["ToneName"] = slot.ToneName;
@@ -195,9 +212,9 @@ namespace Tapbeatbox
             localSettings.Values["SlotCount"] = listOfSlots.Count;
 
         }
-        private Slot LoadSlotItem(int index)
+        private ToneSlot LoadSlotItem(int index)
         {
-            Slot slot = new Slot();
+            ToneSlot slot = new ToneSlot();
             Windows.Storage.ApplicationDataCompositeValue composite = localSettings.Values["Slot" + index] as  Windows.Storage.ApplicationDataCompositeValue;
 
             if (composite == null) return null;
@@ -237,6 +254,33 @@ namespace Tapbeatbox
            // SlotSettings.Height = AppHeight;
         }
 
+        private void OnTap(object sender, DeviceListener.TapEventArgs e)
+        {
+            TrainingProgressValue++;
 
-    }
+        }
+
+        //For timer
+        public void DispatcherTimerSetup()
+        {
+            dispatcherTimer = new DispatcherTimer();
+            dispatcherTimer.Tick += dispatcherTimer_Tick;
+            dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 10);
+            //IsEnabled defaults to false
+
+            dispatcherTimer.Start();
+        }
+
+        void dispatcherTimer_Tick(object sender, object e)
+        {
+
+            if (TrainingProgressValue >= 10)
+                CancelTraining(null, null);
+            TrainingPage_Progress.Value = TrainingProgressValue;
+            
+        }
+
+
+
+        }
 }
