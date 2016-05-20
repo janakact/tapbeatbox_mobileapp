@@ -15,16 +15,23 @@ namespace Tapbeatbox.TapLibrary
         private DataSet currentDataSet;
         
         double lastValue = 0; //Last reading
+        double[] lastValues; //Keep all values
+
         DateTime lastTime ; // LastTime of the reading
         DateTime startTime;
 
 
         //For running 
         bool running = false;
+
         private DeviceListener()
         {
             sensor = new AccelerometerSensor();
             lastTime =  DateTime.Now;
+
+            //To keep last time value;
+            lastValue = 0;
+            lastValues = new double[Constant.parmCount];
         }
 
         //Singleton object generation function
@@ -41,12 +48,12 @@ namespace Tapbeatbox.TapLibrary
         public class TapEventArgs : EventArgs
         {
             private string message;
-            int slotId;
-            int present;
-            public TapEventArgs(int slotId, int present)
+            public int present;
+            public double[] parms;
+            public TapEventArgs(int present,double[] parms)
             {
-                this.slotId = slotId;
                 this.present = present;
+                this.parms = parms;
             }
         }
 
@@ -76,14 +83,21 @@ namespace Tapbeatbox.TapLibrary
                 double sum = readings[0] * readings[0] + readings[1] * readings[1] + readings[2] * readings[2];
                 if(Math.Abs(lastValue - sum) > Constant.valueGap && (DateTime.Now-lastTime)>Constant.timeGap)
                 {
-                    TapEventArgs e = new TapEventArgs(1, 1);
+
+                    TapEventArgs e = new TapEventArgs(1, convertToParms(lastValues,readings)); 
                     OnTap(this, e);
                     lastTime = DateTime.Now;
-                    System.Diagnostics.Debug.WriteLine(lastValue-sum);
                 }
-                System.Diagnostics.Debug.WriteLine(lastValue - sum);
+
+                //Update last time readings
                 lastValue = sum;
+                for(int i=0; i<3; i++)
+                    lastValues[i] = readings[i];
+                
+
             }
+
+
         }
 
         private static DataSet getInitialDataSet()
@@ -97,5 +111,14 @@ namespace Tapbeatbox.TapLibrary
         {
             return currentDataSet;
         }
+        private double[] convertToParms(double[] lastReadings, double[] readings)
+        {
+            double[] parms = new double[3];
+            for (int i = 0; i < Constant.parmCount; i++)
+                parms[i] =  (readings[i] - lastValues[1])*10;
+            return parms;
+        }
     }
+
+    
 }

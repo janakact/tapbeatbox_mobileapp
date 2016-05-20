@@ -158,6 +158,8 @@ namespace Tapbeatbox
             if (!TrainPage.IsOpen) { TrainPage.IsOpen = true; }
 
             TrainingProgressValue = 0;
+            listOfSlots[selectedSlotId].trainingDataSet = new List<double[]>();
+
             //Start the traing thread;
             deviceListener.run();
         }
@@ -263,8 +265,9 @@ namespace Tapbeatbox
 
         private void OnTap(object sender, DeviceListener.TapEventArgs e)
         {
+            
             TrainingProgressValue++;
-
+            listOfSlots[selectedSlotId].trainingDataSet.Add(e.parms);
         }
 
         //For timer
