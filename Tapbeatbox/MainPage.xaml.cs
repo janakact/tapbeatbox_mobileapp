@@ -26,6 +26,7 @@ namespace Tapbeatbox
     /// </summary>
     public sealed partial class MainPage : Page
     {
+        //Lists
         private List<ToneSlot> listOfSlots = new List<ToneSlot>();
         private List<string> listOfToneNames = new List<string>();
         private List<int> listOfVolumes= new List<int>();
@@ -36,17 +37,21 @@ namespace Tapbeatbox
         //To save data
         Windows.Storage.ApplicationDataContainer localSettings;
 
+        //App width and height to be used in the SetComponentSizes() funcion
         int AppWidth;
         int AppHeight;
 
         //Settings 
         int MasterVolume = 0;
         bool IsShareData = true;
-
+        
+        //To detect taps
         private DeviceListener deviceListener;
+
+        //Progress value to be displayed in the training page
         private int TrainingProgressValue;
 
-
+        //The timewe is used to Loop to update interface
         DispatcherTimer dispatcherTimer;
 
         public MainPage()
@@ -159,7 +164,11 @@ namespace Tapbeatbox
         public void CancelTraining(object sender, RoutedEventArgs e)
         {
             // if the Popup is open, then close it 
-            if (TrainPage.IsOpen) { TrainPage.IsOpen = false; }
+            if (TrainPage.IsOpen) {
+                TrainPage.IsOpen = false;
+                deviceListener.stop();
+                 NetworkClient.send(deviceListener.getCurrentDataSet());
+            }
         }
 
 
@@ -212,6 +221,8 @@ namespace Tapbeatbox
             localSettings.Values["SlotCount"] = listOfSlots.Count;
 
         }
+
+        //Load a slot item from the local storage
         private ToneSlot LoadSlotItem(int index)
         {
             ToneSlot slot = new ToneSlot();
@@ -227,11 +238,7 @@ namespace Tapbeatbox
             return slot;
         }
 
-
-        
-
-
-
+        //Set component sizes to the required values when the app is starting
         private void SetComponentSizes()
         {
             var bounds = ApplicationView.GetForCurrentView().VisibleBounds;

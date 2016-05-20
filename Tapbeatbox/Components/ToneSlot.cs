@@ -23,6 +23,8 @@ namespace Tapbeatbox
         private string toneName;
         public string ToneName { get { return toneName; } set { toneName = value; NotifyPropertyChanged(); } }
 
+
+        //This is to update the interface when a value of the object is changed
         public event PropertyChangedEventHandler PropertyChanged;
         private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
         {
