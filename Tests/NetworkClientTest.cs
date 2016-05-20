@@ -10,7 +10,7 @@ namespace Tests
     public class UnitTest1
     {
         [TestMethod]
-        public async Task TestMethod1()
+        public async Task NetworkClientTest()
         {
             System.Diagnostics.Debug.WriteLine("Starting Test");
            

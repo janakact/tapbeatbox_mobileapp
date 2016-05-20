@@ -111,6 +111,7 @@
     <Compile Include="TapLibrary\NetworkClient.cs" />
     <Compile Include="TapLibrary\Sensor.cs" />
     <Compile Include="TapLibrary\Slot.cs" />
+    <Compile Include="TapLibrary\TapRecognizer.cs" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
