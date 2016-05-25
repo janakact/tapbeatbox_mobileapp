@@ -68,7 +68,7 @@ namespace Tapbeatbox.TapLibrary
         }
 
         //This is the function for thread to run
-        public void runThread(Object threadContext)
+        private void runThread(Object threadContext)
         {
             currentDataSet = getInitialDataSet(); // DataSet -----------------
             startTime = DateTime.Now; //-------------------------------------
@@ -115,7 +115,7 @@ namespace Tapbeatbox.TapLibrary
         {
             double[] parms = new double[3];
             for (int i = 0; i < Constant.parmCount; i++)
-                parms[i] =  (readings[i] - lastValues[1])*10;
+                parms[i] =  (readings[i] - lastValues[i])*10;
             return parms;
         }
     }

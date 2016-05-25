@@ -47,6 +47,9 @@ namespace Tapbeatbox
         
         //To detect taps
         private DeviceListener deviceListener;
+        private TapRecognizer tapRecognizer;
+        private String playDetailTextValue;
+        private bool playing = false;
 
         //Progress value to be displayed in the training page
         private int TrainingProgressValue;
@@ -110,6 +113,9 @@ namespace Tapbeatbox
             deviceListener.OnTap += OnTap;
             DispatcherTimerSetup();
 
+            tapRecognizer = new TapRecognizer(listOfSlots);
+            playDetailTextValue = "Details of the Play";
+
         }
 
         // Handles the Click event on the Button inside the Popup control and ------------------------------------------------------------------------
@@ -169,7 +175,9 @@ namespace Tapbeatbox
             if (TrainPage.IsOpen) {
                 TrainPage.IsOpen = false;
                 deviceListener.stop();
-                 NetworkClient.send(deviceListener.getCurrentDataSet());
+                NetworkClient.send(deviceListener.getCurrentDataSet());
+
+                tapRecognizer.train();
             }
         }
 
@@ -178,12 +186,18 @@ namespace Tapbeatbox
 
         public void StartPlaying(object sender, RoutedEventArgs e)
         {
-            if (!PlayPage.IsOpen) { PlayPage.IsOpen = true; }
+            if (!PlayPage.IsOpen) {
+                PlayPage.IsOpen = true;
+                deviceListener.run();
+            }
         }
         public void CancelPlaying(object sender, RoutedEventArgs e)
         {
             // if the Popup is open, then close it 
-            if (PlayPage.IsOpen) { PlayPage.IsOpen = false; }
+            if (PlayPage.IsOpen) {
+                PlayPage.IsOpen = false;
+                deviceListener.stop();
+            }
         }
 
         //Settings Page Related _______________________________________________________________________________________________________
@@ -265,9 +279,21 @@ namespace Tapbeatbox
 
         private void OnTap(object sender, DeviceListener.TapEventArgs e)
         {
-            
-            TrainingProgressValue++;
-            listOfSlots[selectedSlotId].trainingDataSet.Add(e.parms);
+            if(playing)
+            {
+                double[] parms = e.parms;
+                playDetailTextValue = "";
+                for (int i=0; i<parms.Length; i++)
+                {
+                    playDetailTextValue += parms[i]+"\n";
+                }
+                playDetailTextValue += tapRecognizer.recognizeTheSlot(parms);
+            }
+            else
+            {
+                TrainingProgressValue++;
+                listOfSlots[selectedSlotId].trainingDataSet.Add(e.parms);
+            }
         }
 
         //For timer
@@ -287,7 +313,11 @@ namespace Tapbeatbox
             if (TrainingProgressValue >= 10)
                 CancelTraining(null, null);
             TrainingPage_Progress.Value = TrainingProgressValue;
-            
+
+            PlayDetailsText.Text = playDetailTextValue;
+            playing = PlayPage.IsOpen;
+
+
         }
 
 

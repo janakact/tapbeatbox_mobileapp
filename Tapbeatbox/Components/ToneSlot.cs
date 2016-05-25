@@ -9,7 +9,7 @@ using Tapbeatbox.TapLibrary;
 
 namespace Tapbeatbox
 {
-    class ToneSlot: INotifyPropertyChanged,Slot
+    public class ToneSlot: INotifyPropertyChanged,Slot
     {
         private int id;
         public int ID { get { return id; } set { id = value; } }

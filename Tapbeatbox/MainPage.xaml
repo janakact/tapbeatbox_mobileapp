@@ -60,6 +60,7 @@
                 <StackPanel  VerticalAlignment="Center" HorizontalAlignment="Stretch">
                     <TextBlock Text="Tap to the device and play"></TextBlock>
                     <Button Content="Cancel" Click="CancelPlaying" HorizontalAlignment="Center" />
+                    <TextBlock x:Name="PlayDetailsText">Details</TextBlock>
                 </StackPanel>
             </Border>
         </Popup>

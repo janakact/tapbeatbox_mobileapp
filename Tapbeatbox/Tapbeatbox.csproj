@@ -109,6 +109,7 @@
     <Compile Include="TapLibrary\DeviceListener.cs" />
     <Compile Include="Components\ToneSlot.cs" />
     <Compile Include="TapLibrary\NetworkClient.cs" />
+    <Compile Include="TapLibrary\NeuralNet.cs" />
     <Compile Include="TapLibrary\Sensor.cs" />
     <Compile Include="TapLibrary\Slot.cs" />
     <Compile Include="TapLibrary\TapRecognizer.cs" />
