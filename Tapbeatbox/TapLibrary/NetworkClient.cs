@@ -16,7 +16,7 @@ namespace Tapbeatbox.TapLibrary
         public static async Task send(DataSet dataSet)
         {
             //Where we are posting to: 
-            Uri theUri = new Uri("http://tapbeatbox-globalgoals.rhcloud.com/rest/data/add");
+            Uri theUri = new Uri(Constant.networkURI);
             System.Diagnostics.Debug.WriteLine("URI Created");
 
             //Create an Http client and set the headers we want 

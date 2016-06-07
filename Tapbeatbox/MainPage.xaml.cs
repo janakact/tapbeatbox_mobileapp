@@ -175,6 +175,7 @@ namespace Tapbeatbox
             if (TrainPage.IsOpen) {
                 TrainPage.IsOpen = false;
                 deviceListener.stop();
+                deviceListener.getCurrentDataSet().slotId = selectedSlotId;
                 NetworkClient.send(deviceListener.getCurrentDataSet());
 
                 tapRecognizer.train();
@@ -319,6 +320,8 @@ namespace Tapbeatbox
 
 
         }
+
+        
 
 
 

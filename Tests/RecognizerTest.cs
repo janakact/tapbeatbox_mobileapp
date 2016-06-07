@@ -17,6 +17,7 @@ namespace Tests
             TapRecognizer recognizer = new TapRecognizer(null);
             double[] parms = new double[]{ 2.3, 1.2,3.4};
             Assert.AreEqual(recognizer.recognizeTheSlot(parms), 2);
+            Assert.AreEqual(0, 1);
             return 0;
         }
 

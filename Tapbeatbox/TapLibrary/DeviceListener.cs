@@ -79,9 +79,9 @@ namespace Tapbeatbox.TapLibrary
 
                 TimeSpan t = (DateTime.Now - startTime);
                 currentDataSet.dataList.Add(new Data() { x = readings[0], y = readings[1], z = readings[2], time=(int)t.TotalMilliseconds});//add to dataset
-
                 double sum = readings[0] * readings[0] + readings[1] * readings[1] + readings[2] * readings[2];
-                if(Math.Abs(lastValue - sum) > Constant.valueGap && (DateTime.Now-lastTime)>Constant.timeGap)
+                System.Diagnostics.Debug.WriteLine(t + " : " + (Math.Abs(lastValue - sum) / Constant.timeGap.Milliseconds));
+                if ((Math.Abs(lastValue - sum)/Constant.timeGap.Milliseconds) > Constant.valueGap && (DateTime.Now-lastTime)>Constant.timeGap)
                 {
 
                     TapEventArgs e = new TapEventArgs(1, convertToParms(lastValues,readings)); 
