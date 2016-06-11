@@ -35,5 +35,7 @@ namespace Tapbeatbox
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
         }
+
+        
     }
 }

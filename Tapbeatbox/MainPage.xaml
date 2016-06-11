@@ -16,7 +16,7 @@
                 <Border x:Name="SlotSettingsBorder" BorderBrush="{StaticResource ApplicationForegroundThemeBrush}" 
                 Background="{StaticResource ApplicationPageBackgroundThemeBrush}"
                 BorderThickness="2" HorizontalAlignment="Stretch">
-                    <StackPanel  VerticalAlignment="Center" HorizontalAlignment="Stretch">
+                    <StackPanel Orientation="Horizontal"  VerticalAlignment="Center" HorizontalAlignment="Stretch">
                     <TextBox Name="SlotSettings_Name" HorizontalAlignment="Center"></TextBox>
 
                         <!--Tone-->
