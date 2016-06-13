@@ -408,7 +408,7 @@ namespace Tapbeatbox.TapLibrary
             }
         }
 
-        public void Train(double[][] inputs, double[][] expected, TrainingType type, int iterations)
+        public void Train(double[][] inputs, double[][] expected, TrainingType type, int iterations, Components.TrainInfo trainInfo)
         {
             int i, j;
 
@@ -428,6 +428,7 @@ namespace Tapbeatbox.TapLibrary
                                 BackPropogation_TrainingSession(this, inputs[j], expected[j]);
 
                             ApplyLearning(); // apply batch of cumlutive weight changes
+                            trainInfo.Presentage = (double)i / iterations;
                         }
 
                     }

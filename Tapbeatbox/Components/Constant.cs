@@ -18,7 +18,7 @@ namespace Tapbeatbox
         public const int parmCount = 3;
         public const int trainingTapCount = 10;
 
-        public const int neuralNetFeedCount = 10000;
+        public const int neuralNetFeedCount = 1000;
         public const string networkURI = "http://tapbeatbox-globalgoals.rhcloud.com/rest/data/add";
     }
 }

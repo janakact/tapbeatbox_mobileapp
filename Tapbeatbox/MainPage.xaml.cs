@@ -18,6 +18,8 @@ using Tapbeatbox.TapLibrary;
 using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.UI.Core;
+using System.Runtime.Serialization;
+using Windows.Storage.Streams;
 
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
@@ -33,6 +35,8 @@ namespace Tapbeatbox
         private List<ToneSlot> listOfSlots = new List<ToneSlot>();
         private List<string> listOfToneNames = new List<string>();
         private List<int> listOfVolumes = new List<int>();
+
+        Components.MediaManager mediaManager = new Components.MediaManager();
 
         //To be used when slot settings save
         int selectedSlotId = 0;
@@ -53,13 +57,16 @@ namespace Tapbeatbox
         private TapRecognizer tapRecognizer;
         private String playDetailTextValue;
         private bool playing = false;
+        private bool trainingAll = false;
 
         //Progress value to be displayed in the training page
         private int TrainingProgressValue;
+        private Components.TrainInfo trainInfo = new Components.TrainInfo();
 
         //The timewe is used to Loop to update interface
         DispatcherTimer dispatcherTimer;
 
+       
         public MainPage()
         {
 
@@ -67,21 +74,15 @@ namespace Tapbeatbox
             this.DataContext = new ViewModel.HomePageViewModel();
 
             setup();
-
         }
 
 
         public void setup()
         {
 
-            //Load Media
-            LoadEfx();
 
             localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
-
-
-            listOfToneNames.Add("Clap");
-            listOfToneNames.Add("Foot");
+            listOfToneNames = mediaManager.ToneNames;
 
             for (int i = Constant.minVolume; i <= Constant.maxVolume; i++)
             {
@@ -131,6 +132,10 @@ namespace Tapbeatbox
 
             tapRecognizer = new TapRecognizer(listOfSlots);
             playDetailTextValue = "Details of the Play";
+
+
+            //Load Media
+            mediaManager.loadMedia();
         }
 
         // Handles the Click event on the Button inside the Popup control and ------------------------------------------------------------------------
@@ -145,7 +150,7 @@ namespace Tapbeatbox
                 if (item.ID == selectedSlotId)
                 {
                     item.Name = SlotSettings_Name.Text;
-                    item.ToneName = SlotSettings_Tone.SelectedItem as String;
+                    item.ToneName = SlotSettings_Tone.SelectedItem as string;
                     item.Volume = (int)SlotSettings_Volume.SelectedItem;
                     SaveSlotItem(i);
                     break;
@@ -164,7 +169,12 @@ namespace Tapbeatbox
             ToneSlot s = e.ClickedItem as ToneSlot;
 
             SlotSettings_Name.Text = s.Name;
-            SlotSettings_Tone.SelectedItem = s.ToneName;
+            SlotSettings_Tone.SelectedValue = s.ToneName;
+            //foreach (var key in mediaManager.ToneNameIdMap.Keys)
+            //{
+            //    if (mediaManager.ToneNameIdMap[key] == s.ToneName)
+            //        SlotSettings_Tone.SelectedValue = key;
+            //}
             SlotSettings_Volume.SelectedItem = s.Volume;
             selectedSlotId = s.ID;
 
@@ -178,6 +188,7 @@ namespace Tapbeatbox
         {
             if (!TrainPage.IsOpen) { TrainPage.IsOpen = true; }
 
+            trainingAll = false;
             TrainingProgressValue = 0;
             listOfSlots[selectedSlotId].trainingDataSet = new List<double[]>();
 
@@ -187,17 +198,35 @@ namespace Tapbeatbox
         public void CancelTraining(object sender, RoutedEventArgs e)
         {
             // if the Popup is open, then close it 
-            if (TrainPage.IsOpen)
+            if (TrainPage.IsOpen && !trainingAll)
             {
                 TrainPage.IsOpen = false;
                 deviceListener.stop();
                 deviceListener.getCurrentDataSet().slotId = selectedSlotId;
-                NetworkClient.send(deviceListener.getCurrentDataSet());
+                var t = Task.Run(() =>
+                {
+                    NetworkClient.send(deviceListener.getCurrentDataSet());
+                });
 
-                tapRecognizer.train();
             }
         }
 
+        public void TrainAll(object sender, RoutedEventArgs e)
+        {
+            trainInfo.Presentage = 0;
+            trainingAll = true;
+            TrainPage.IsOpen = true;
+            var t = Task.Run(() =>
+            {
+                tapRecognizer.train(trainInfo);
+            });
+        }
+
+        
+
+      
+            
+        
 
         //Playing Page Related _______________________________________________________________________________________________________
 
@@ -206,6 +235,10 @@ namespace Tapbeatbox
             if (!PlayPage.IsOpen)
             {
                 PlayPage.IsOpen = true;
+                if (!tapRecognizer.Trained)
+                {
+                    TrainAll(null, null);
+                }
                 deviceListener.run();
             }
         }
@@ -242,6 +275,8 @@ namespace Tapbeatbox
         //Load and Save Slot Items
         private void SaveSlotItem(int index)
         {
+
+
             if (index >= listOfSlots.Count) return;
             Windows.Storage.ApplicationDataCompositeValue composite =
      new Windows.Storage.ApplicationDataCompositeValue();
@@ -254,6 +289,8 @@ namespace Tapbeatbox
 
             localSettings.Values["Slot" + index] = composite;
             localSettings.Values["SlotCount"] = listOfSlots.Count;
+
+            SaveTrainingData(slot.ID, slot.trainingDataSet);
 
         }
 
@@ -268,10 +305,62 @@ namespace Tapbeatbox
             slot.ID = (int)composite["ID"];
             slot.Name = (string)composite["Name"];
             slot.Volume = (int)composite["Volume"];
-            slot.ToneName = (string)composite["ToneName"];
-
+            try
+            {
+                slot.ToneName = (string)composite["ToneName"];
+            }
+            catch
+            {
+                slot.ToneName = listOfToneNames[0];
+            }
+            //slot.trainingDataSet = (List<double[]>)composite["DataSet"];
+            LoadTrainingData(slot.ID, slot.trainingDataSet);
             return slot;
         }
+
+        public async void SaveTrainingData(int index, List<double[]> dataList)
+        {
+            StorageFile userdetailsfile = await ApplicationData.Current.LocalFolder.CreateFileAsync("DataList"+index, CreationCollisionOption.ReplaceExisting);
+
+            IRandomAccessStream raStream = await userdetailsfile.OpenAsync(FileAccessMode.ReadWrite);
+
+            using (IOutputStream outStream = raStream.GetOutputStreamAt(0))
+            {
+
+                // Serialize the Session State. 
+
+                DataContractSerializer serializer = new DataContractSerializer(typeof(List<Double[]>));
+
+                serializer.WriteObject(outStream.AsStreamForWrite(), dataList);
+
+                await outStream.FlushAsync();
+                outStream.Dispose(); //  
+                raStream.Dispose();
+            }
+        }
+
+        public async void LoadTrainingData(int index, List<double[]> dataList)
+        {
+            dataList.Clear();
+
+            var Serializer = new DataContractSerializer(typeof(List<double[]>));
+            try
+            {
+                using (var stream = await ApplicationData.Current.LocalFolder.OpenStreamForReadAsync("DataList" + index))
+                {
+                    dataList.AddRange((List<double[]>)Serializer.ReadObject(stream));
+                }
+            }
+            catch (Exception)
+            {
+
+                dataList.Clear();
+            }
+        }
+
+
+
+
 
         //Set component sizes to the required values when the app is starting
         private void SetComponentSizes()
@@ -306,13 +395,20 @@ namespace Tapbeatbox
                 {
                     playDetailTextValue += parms[i] + "\n";
                 }
-                playDetailTextValue += tapRecognizer.recognizeTheSlot(parms);
+                int recognizedValue = tapRecognizer.recognizeTheSlot(parms);
+                playDetailTextValue += recognizedValue;
+
+                //Play the tone
+                mediaManager.Play(listOfSlots[recognizedValue].ToneName);
+
             }
             else
             {
                 TrainingProgressValue++;
                 listOfSlots[selectedSlotId].trainingDataSet.Add(e.parms);
-                Play(1);
+
+                //Play the tone
+                mediaManager.Play(listOfSlots[selectedSlotId].ToneName);
             }
         }
 
@@ -330,51 +426,25 @@ namespace Tapbeatbox
         void dispatcherTimer_Tick(object sender, object e)
         {
 
-            if (TrainingProgressValue >= 10)
-                CancelTraining(null, null);
-            TrainingPage_Progress.Value = TrainingProgressValue;
+
+            if (trainingAll)
+            {
+                TrainingPage_Progress.Value = trainInfo.Presentage;
+                if (trainInfo.Presentage >= 1)
+                    TrainPage.IsOpen = false;
+            }
+            else
+            {
+                TrainingPage_Progress.Value = (double)TrainingProgressValue / Constant.trainingTapCount;
+                if (TrainingProgressValue >= 10)
+                    CancelTraining(null, null);
+            }
 
             PlayDetailsText.Text = playDetailTextValue;
             playing = PlayPage.IsOpen;
-
-
         }
+        
 
-        //Media
-        List<MediaElement> mediaList;
-
-        private async void LoadEfx()
-        {
-            mediaList = new List<MediaElement>();
-            mediaList.Add(await LoadSoundFile("1.mp3"));
-            mediaList.Add(await LoadSoundFile("2.mp3"));
-            mediaList.Add(await LoadSoundFile("3.wav"));
-
-        }
-
-        private async Task<MediaElement> LoadSoundFile(string v)
-        {
-            MediaElement snd = new MediaElement();
-
-            snd.AutoPlay = false;
-
-            StorageFolder folder = await Windows.ApplicationModel.Package.Current.InstalledLocation.GetFolderAsync("Assets");
-            StorageFile file = await folder.GetFileAsync(v);
-            var stream = await file.OpenAsync(FileAccessMode.Read);
-            snd.SetSource(stream, file.ContentType);
-            return snd;
-        }
-
-        public async Task Play(int i)
-        {
-            MediaElement m = mediaList[i];
-            await m.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-            {
-                m.Stop();
-                System.Diagnostics.Debug.WriteLine("Calling m.Play");
-                m.Play();
-            });
-        }
 
 
 

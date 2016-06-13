@@ -37,20 +37,7 @@
         
 
 
-        <!--Training Page-->
-        <Popup  x:Name="TrainPage" IsOpen="False" HorizontalAlignment="Stretch" >
 
-            <Border x:Name="TrainPageBorder" BorderBrush="{StaticResource ApplicationForegroundThemeBrush}" 
-                Background="{StaticResource ApplicationPageBackgroundThemeBrush}"
-                BorderThickness="2" HorizontalAlignment="Stretch">
-                <StackPanel  VerticalAlignment="Center" HorizontalAlignment="Stretch">
-                    <TextBlock Text="Training"></TextBlock>
-                    <ProgressBar Height="30" Minimum="0" Maximum="10"  x:Name="TrainingPage_Progress"></ProgressBar>
-                    <TextBlock x:Name="AccReading"></TextBlock>
-                    <Button Content="Cancel" Click="CancelTraining" HorizontalAlignment="Center" />
-                </StackPanel>
-            </Border>
-        </Popup>
 
         <!--Play Page-->
         <Popup  x:Name="PlayPage" IsOpen="False" HorizontalAlignment="Stretch" >
@@ -61,6 +48,21 @@
                     <TextBlock Text="Tap to the device and play"></TextBlock>
                     <Button Content="Cancel" Click="CancelPlaying" HorizontalAlignment="Center" />
                     <TextBlock x:Name="PlayDetailsText">Details</TextBlock>
+                </StackPanel>
+            </Border>
+        </Popup>
+
+        <!--Training Page-->
+        <Popup  x:Name="TrainPage" IsOpen="False" HorizontalAlignment="Stretch"   >
+
+            <Border x:Name="TrainPageBorder" BorderBrush="{StaticResource ApplicationForegroundThemeBrush}" 
+                Background="{StaticResource ApplicationPageBackgroundThemeBrush}"
+                BorderThickness="2" HorizontalAlignment="Stretch">
+                <StackPanel  VerticalAlignment="Center" HorizontalAlignment="Stretch">
+                    <TextBlock Text="Training"></TextBlock>
+                    <ProgressBar Height="30" Minimum="0" Maximum="1"  x:Name="TrainingPage_Progress"></ProgressBar>
+                    <TextBlock x:Name="AccReading"></TextBlock>
+                    <Button Content="Cancel" Click="CancelTraining" HorizontalAlignment="Center" />
                 </StackPanel>
             </Border>
         </Popup>
@@ -97,7 +99,7 @@
 
             <Button Grid.Column="0" Grid.Row="0" Height="30" HorizontalAlignment="Stretch"  Margin="10" Content="Play" Click="StartPlaying"></Button>
             <Button Grid.Column="1" Grid.Row="0" Height="30" HorizontalAlignment="Stretch" Margin="10" Content="Settings" Click="OpenSettings"></Button>
-            <Button Grid.Column="2" Grid.Row="0" Height="30" HorizontalAlignment="Stretch" Margin="10" Content="Add Slot"></Button>
+            <Button Grid.Column="2" Grid.Row="0" Height="30" HorizontalAlignment="Stretch" Margin="10" Content="Train All" Click="TrainAll"></Button>
         </Grid>
 
         <!--Slot List-->
@@ -118,6 +120,7 @@
                         <TextBlock Grid.Column="1" Text="{Binding Name}"  TextWrapping="NoWrap"/>
                         <TextBlock Grid.Column="2" Text="{Binding Volume}"  TextWrapping="NoWrap"/>
                         <TextBlock Grid.Column="3" Text="{Binding ToneName}"  MaxHeight="60"/>
+                        <TextBlock Grid.Column="3" Text="{Binding trainingDataSet.Count}"  MaxHeight="60"/>
                     </Grid>
                 </DataTemplate>
             </ListView.ItemTemplate>

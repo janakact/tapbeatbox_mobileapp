@@ -13,6 +13,14 @@ namespace Tapbeatbox.TapLibrary
 
         double high, mid, low;
 
+        private bool _trained;
+
+        public bool Trained
+        {
+            get { return _trained; }
+        }
+
+
         public TapRecognizer(List<ToneSlot> slots)
         {
             listOfSlots = slots;
@@ -21,6 +29,7 @@ namespace Tapbeatbox.TapLibrary
             low = .01;
             mid = .5;
 
+            _trained = false;
 
             net = new NeuralNet();
             
@@ -49,10 +58,11 @@ namespace Tapbeatbox.TapLibrary
             return ret;
         }
 
-        public void train()
+        public void train(Components.TrainInfo trainInfo)
         {
+            trainInfo.Presentage = 0;
             //Initialize the nural net
-            net.Initialize(1, Constant.parmCount, Constant.parmCount, listOfSlots.Count);
+            net.Initialize(1, Constant.parmCount, Constant.parmCount*2, listOfSlots.Count);
 
             List<double[]> inputList = new List<double[]>(); //All the inpust and outputs
             List<double[]> outputList = new List<double[]>();
@@ -74,9 +84,12 @@ namespace Tapbeatbox.TapLibrary
 
             #region TrainingSection
             System.Diagnostics.Debug.WriteLine("Start Training");
-            net.Train(input, output, TrainingType.BackPropogation, Constant.neuralNetFeedCount);
+            net.Train(input, output, TrainingType.BackPropogation, Constant.neuralNetFeedCount,trainInfo);
             System.Diagnostics.Debug.WriteLine("Finished Training");
+            trainInfo.Presentage = 2;
             #endregion
+
+            _trained = true;
 
         }
 

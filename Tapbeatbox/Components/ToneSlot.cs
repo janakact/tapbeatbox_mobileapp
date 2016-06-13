@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Tapbeatbox.TapLibrary;
+using Windows.UI.Core;
 
 namespace Tapbeatbox
 {
@@ -18,7 +19,9 @@ namespace Tapbeatbox
         public string Name { get { return name; }set { name = value; NotifyPropertyChanged(); } }
 
         private int volume;
-        public int Volume { get { return volume; } set { volume = value; NotifyPropertyChanged(); } }
+        public int Volume { get { return volume; } set { volume = value; NotifyPropertyChanged();
+                
+            } }
 
         private string toneName;
         public string ToneName { get { return toneName; } set { toneName = value; NotifyPropertyChanged(); } }
@@ -36,6 +39,7 @@ namespace Tapbeatbox
             }
         }
 
-        
+
+
     }
 }

@@ -99,7 +99,9 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="Components\Constant.cs" />
+    <Compile Include="Components\MediaManager.cs" />
     <Compile Include="Components\Tone.cs" />
+    <Compile Include="Components\TrainInfo.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
