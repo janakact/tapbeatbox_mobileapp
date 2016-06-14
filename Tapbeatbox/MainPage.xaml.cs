@@ -32,11 +32,11 @@ namespace Tapbeatbox
     public sealed partial class MainPage : Page
     {
         //Lists
-        private List<ToneSlot> listOfSlots = new List<ToneSlot>();
         private List<string> listOfToneNames = new List<string>();
         private List<int> listOfVolumes = new List<int>();
 
         Components.MediaManager mediaManager = new Components.MediaManager();
+        Components.ContententManager contentManager = new Components.ContententManager();
 
         //To be used when slot settings save
         int selectedSlotId = 0;
@@ -91,34 +91,10 @@ namespace Tapbeatbox
 
             System.Diagnostics.Debug.WriteLine("Starting the app.");
 
-
-
-            //Load User Data
-            dynamic a = localSettings.Values["SlotCount"];
-            int slotCount = (a == null) ? 0 : (int)a;
-            for (int i = 0; i < slotCount; i++)
-            {
-                ToneSlot s = LoadSlotItem(i);
-                if (s != null) listOfSlots.Add(s);
-            }
-            dynamic isShareData = localSettings.Values["IsShareData"];
-            IsShareData = isShareData == 1 ? true : false;
-
-            dynamic masterVolume = localSettings.Values["masterVolume"];
-            MasterVolume = masterVolume == null ? Constant.defaultVolume : (int)masterVolume;
-
-            //Default dummy slots
-            if (slotCount == 0)
-            {
-                for (int i = 0; i < 3; i++)
-                {
-                    listOfSlots.Add(new ToneSlot { ID = i, Name = "Slot" + i, Volume = Constant.defaultVolume, ToneName = listOfToneNames[0] });
-                    SaveSlotItem(i);
-                }
-            }
-
-
-            SlotList.ItemsSource = listOfSlots;
+            //Load data
+            contentManager.DefaultToneName = mediaManager.ToneNames[0];
+            contentManager.loadData();
+            SlotList.ItemsSource = contentManager.ListOfSlots;
 
 
             //Get Window size
@@ -130,7 +106,7 @@ namespace Tapbeatbox
             deviceListener.OnTap += OnTap;
             DispatcherTimerSetup();
 
-            tapRecognizer = new TapRecognizer(listOfSlots);
+            tapRecognizer = new TapRecognizer(contentManager.ListOfSlots);
             playDetailTextValue = "Details of the Play";
 
 
@@ -145,14 +121,14 @@ namespace Tapbeatbox
 
             //Iterate and find the relevent slot
             int i = 0;
-            foreach (var item in listOfSlots)
+            foreach (var item in contentManager.ListOfSlots)
             {
                 if (item.ID == selectedSlotId)
                 {
                     item.Name = SlotSettings_Name.Text;
                     item.ToneName = SlotSettings_Tone.SelectedItem as string;
                     item.Volume = (int)SlotSettings_Volume.SelectedItem;
-                    SaveSlotItem(i);
+                    contentManager.SaveSlotItem(i);
                     break;
                 }
                 i++;
@@ -190,7 +166,7 @@ namespace Tapbeatbox
 
             trainingAll = false;
             TrainingProgressValue = 0;
-            listOfSlots[selectedSlotId].trainingDataSet = new List<double[]>();
+            contentManager.ListOfSlots[selectedSlotId].trainingDataSet = new List<double[]>();
 
             //Start the traing thread;
             deviceListener.run();
@@ -255,112 +231,24 @@ namespace Tapbeatbox
         //Settings Page Related _______________________________________________________________________________________________________
         public void OpenSettings(object sender, RoutedEventArgs e)
         {
-            Settings_MasterVolume.SelectedItem = MasterVolume;
-            Settings_IsShareData.IsChecked = IsShareData;
+            Settings_MasterVolume.SelectedItem = contentManager.MasterVolume;
+            Settings_IsShareData.IsChecked = contentManager.IsShareData;
             if (!SettingsPage.IsOpen) { SettingsPage.IsOpen = true; }
         }
         public void CloseSettings(object sender, RoutedEventArgs e)
         {
-            MasterVolume = (int)Settings_MasterVolume.SelectedItem;
-            IsShareData = Settings_IsShareData.IsChecked.Value;
+            contentManager.MasterVolume = (int)Settings_MasterVolume.SelectedItem;
+            contentManager.IsShareData = Settings_IsShareData.IsChecked.Value;
 
-            localSettings.Values["MasterVolume"] = MasterVolume;
-            localSettings.Values["IsShareData"] = IsShareData ? 1 : 0;
+            contentManager.SaveGeneralData();
             // if the Popup is open, then close it 
             if (SettingsPage.IsOpen) { SettingsPage.IsOpen = false; }
         }
 
-
-
-        //Load and Save Slot Items
-        private void SaveSlotItem(int index)
+        public void AddNewSlot(object sender, RoutedEventArgs e)
         {
-
-
-            if (index >= listOfSlots.Count) return;
-            Windows.Storage.ApplicationDataCompositeValue composite =
-     new Windows.Storage.ApplicationDataCompositeValue();
-
-            ToneSlot slot = listOfSlots[index];
-            composite["ID"] = slot.ID;
-            composite["Name"] = slot.Name;
-            composite["ToneName"] = slot.ToneName;
-            composite["Volume"] = slot.Volume;
-
-            localSettings.Values["Slot" + index] = composite;
-            localSettings.Values["SlotCount"] = listOfSlots.Count;
-
-            SaveTrainingData(slot.ID, slot.trainingDataSet);
-
+            contentManager.addNewSlot();
         }
-
-        //Load a slot item from the local storage
-        private ToneSlot LoadSlotItem(int index)
-        {
-            ToneSlot slot = new ToneSlot();
-            Windows.Storage.ApplicationDataCompositeValue composite = localSettings.Values["Slot" + index] as Windows.Storage.ApplicationDataCompositeValue;
-
-            if (composite == null) return null;
-
-            slot.ID = (int)composite["ID"];
-            slot.Name = (string)composite["Name"];
-            slot.Volume = (int)composite["Volume"];
-            try
-            {
-                slot.ToneName = (string)composite["ToneName"];
-            }
-            catch
-            {
-                slot.ToneName = listOfToneNames[0];
-            }
-            //slot.trainingDataSet = (List<double[]>)composite["DataSet"];
-            LoadTrainingData(slot.ID, slot.trainingDataSet);
-            return slot;
-        }
-
-        public async void SaveTrainingData(int index, List<double[]> dataList)
-        {
-            StorageFile userdetailsfile = await ApplicationData.Current.LocalFolder.CreateFileAsync("DataList"+index, CreationCollisionOption.ReplaceExisting);
-
-            IRandomAccessStream raStream = await userdetailsfile.OpenAsync(FileAccessMode.ReadWrite);
-
-            using (IOutputStream outStream = raStream.GetOutputStreamAt(0))
-            {
-
-                // Serialize the Session State. 
-
-                DataContractSerializer serializer = new DataContractSerializer(typeof(List<Double[]>));
-
-                serializer.WriteObject(outStream.AsStreamForWrite(), dataList);
-
-                await outStream.FlushAsync();
-                outStream.Dispose(); //  
-                raStream.Dispose();
-            }
-        }
-
-        public async void LoadTrainingData(int index, List<double[]> dataList)
-        {
-            dataList.Clear();
-
-            var Serializer = new DataContractSerializer(typeof(List<double[]>));
-            try
-            {
-                using (var stream = await ApplicationData.Current.LocalFolder.OpenStreamForReadAsync("DataList" + index))
-                {
-                    dataList.AddRange((List<double[]>)Serializer.ReadObject(stream));
-                }
-            }
-            catch (Exception)
-            {
-
-                dataList.Clear();
-            }
-        }
-
-
-
-
 
         //Set component sizes to the required values when the app is starting
         private void SetComponentSizes()
@@ -399,16 +287,16 @@ namespace Tapbeatbox
                 playDetailTextValue += recognizedValue;
 
                 //Play the tone
-                mediaManager.Play(listOfSlots[recognizedValue].ToneName);
+                mediaManager.Play(contentManager.ListOfSlots[recognizedValue].ToneName);
 
             }
             else
             {
                 TrainingProgressValue++;
-                listOfSlots[selectedSlotId].trainingDataSet.Add(e.parms);
+                contentManager.ListOfSlots[selectedSlotId].trainingDataSet.Add(e.parms);
 
                 //Play the tone
-                mediaManager.Play(listOfSlots[selectedSlotId].ToneName);
+                mediaManager.Play(contentManager.ListOfSlots[selectedSlotId].ToneName);
             }
         }
 

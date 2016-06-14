@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,7 +9,7 @@ namespace Tapbeatbox.TapLibrary
 {
     public class TapRecognizer
     {
-        private List<ToneSlot> listOfSlots;
+        private ObservableCollection<ToneSlot> listOfSlots;
         NeuralNet net;
 
         double high, mid, low;
@@ -21,7 +22,7 @@ namespace Tapbeatbox.TapLibrary
         }
 
 
-        public TapRecognizer(List<ToneSlot> slots)
+        public TapRecognizer(ObservableCollection<ToneSlot> slots)
         {
             listOfSlots = slots;
 
@@ -48,7 +49,7 @@ namespace Tapbeatbox.TapLibrary
             net.Pulse();
 
             int ret = 0;
-            for(int i=1; i<Constant.parmCount; i++)
+            for(int i=1; i<listOfSlots.Count; i++)
             {
                 if (net.OutputLayer[i].Output > net.OutputLayer[ret].Output)
                     ret = i;
@@ -69,6 +70,7 @@ namespace Tapbeatbox.TapLibrary
             #region Setup Training Data
             foreach(ToneSlot t in listOfSlots)
             {
+
                 double[] outputValues = new double[listOfSlots.Count]; //Each slot contain a set of data. 
                 outputValues[t.ID] = high; // For all those data , output will be same. the slot id
                 foreach(double[] d in t.trainingDataSet)
@@ -76,6 +78,8 @@ namespace Tapbeatbox.TapLibrary
                     outputList.Add(outputValues);
                     inputList.Add(d);
                 }
+
+                System.Diagnostics.Debug.WriteLine("Generatiing input for:" + t.ID + " "+outputValues.Length);
             }
 
             double[][] input = inputList.ToArray<double[]>();
