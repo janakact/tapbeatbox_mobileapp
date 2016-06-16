@@ -50,6 +50,13 @@ namespace Tapbeatbox.Components
 
         }
 
+        public void removeSlot()
+        {
+            if(_listOfSlots.Count>1)
+                _listOfSlots.RemoveAt(_listOfSlots.Count - 1);
+
+        }
+
         public void loadData()
         {
             localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;

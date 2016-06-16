@@ -19,6 +19,7 @@ namespace Tapbeatbox.TapLibrary
         public bool Trained
         {
             get { return _trained; }
+            set { _trained = value; }
         }
 
 

@@ -113,9 +113,13 @@ namespace Tapbeatbox.TapLibrary
         }
         private double[] convertToParms(double[] lastReadings, double[] readings)
         {
-            double[] parms = new double[3];
-            for (int i = 0; i < Constant.parmCount; i++)
-                parms[i] =  (readings[i] - lastValues[i])*10;
+            double[] parms = new double[Constant.parmCount];
+            for (int i = 0; i < 3; i++)
+            {
+                parms[i] = (readings[i] - lastValues[i]) * 10;
+                parms[i + 3] = (readings[i] - lastValues[i])*(readings[(i+1)%3] - lastValues[(i + 1) % 3]) * 10;
+            }
+            
             return parms;
         }
     }

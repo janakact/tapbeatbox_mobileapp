@@ -128,6 +128,37 @@
     <Content Include="Assets\1.mp3" />
     <Content Include="Assets\2.mp3" />
     <Content Include="Assets\3.wav" />
+    <Content Include="Assets\media\Clap1.wav" />
+    <Content Include="Assets\media\Clap2.wav" />
+    <Content Include="Assets\media\Clash1.wav" />
+    <Content Include="Assets\media\Clash2.wav" />
+    <Content Include="Assets\media\Hihat1.wav" />
+    <Content Include="Assets\media\Hihat2.wav" />
+    <Content Include="Assets\media\Kick1.wav" />
+    <Content Include="Assets\media\Kick2.wav" />
+    <Content Include="Assets\media\Kick3.wav" />
+    <Content Include="Assets\media\Kick4.wav" />
+    <Content Include="Assets\media\Kick5.wav" />
+    <Content Include="Assets\media\Kick6.wav" />
+    <Content Include="Assets\media\Kick7.wav" />
+    <Content Include="Assets\media\LectureHall1.wav" />
+    <Content Include="Assets\media\LectureHall2.wav" />
+    <Content Include="Assets\media\Shaker1.wav" />
+    <Content Include="Assets\media\Shaker2.wav" />
+    <Content Include="Assets\media\Shaker3.wav" />
+    <Content Include="Assets\media\Shotgun1.wav" />
+    <Content Include="Assets\media\Snare1.wav" />
+    <Content Include="Assets\media\Snare10.wav" />
+    <Content Include="Assets\media\Snare11.wav" />
+    <Content Include="Assets\media\Snare12.wav" />
+    <Content Include="Assets\media\Snare2.wav" />
+    <Content Include="Assets\media\Snare3.wav" />
+    <Content Include="Assets\media\Snare4.wav" />
+    <Content Include="Assets\media\Snare5.wav" />
+    <Content Include="Assets\media\Snare6.wav" />
+    <Content Include="Assets\media\Snare7.wav" />
+    <Content Include="Assets\media\Snare8.wav" />
+    <Content Include="Assets\media\Snare9.wav" />
     <Content Include="Properties\Default.rd.xml" />
     <Content Include="Assets\LockScreenLogo.scale-200.png" />
     <Content Include="Assets\SplashScreen.scale-200.png" />
@@ -147,6 +178,7 @@
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>

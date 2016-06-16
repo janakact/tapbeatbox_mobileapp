@@ -176,6 +176,7 @@ namespace Tapbeatbox
             // if the Popup is open, then close it 
             if (TrainPage.IsOpen && !trainingAll)
             {
+                tapRecognizer.Trained = false;
                 TrainPage.IsOpen = false;
                 deviceListener.stop();
                 deviceListener.getCurrentDataSet().slotId = selectedSlotId;
@@ -247,7 +248,13 @@ namespace Tapbeatbox
 
         public void AddNewSlot(object sender, RoutedEventArgs e)
         {
+            tapRecognizer.Trained = false;
             contentManager.addNewSlot();
+        }
+        public void RemoveSlot(object sender, RoutedEventArgs e)
+        {
+            tapRecognizer.Trained = false;
+            contentManager.removeSlot();
         }
 
         //Set component sizes to the required values when the app is starting
@@ -332,10 +339,15 @@ namespace Tapbeatbox
             playing = PlayPage.IsOpen;
         }
         
+        public void ToneHold(object sender, RoutedEventArgs e)
+        {
+            
+        }
 
+        private void SlotSettings_Tone_Holding(object sender, object e)
+        {
 
-
-
-
+            mediaManager.Play((string)SlotSettings_Tone.SelectedValue);
+        }
     }
 }
