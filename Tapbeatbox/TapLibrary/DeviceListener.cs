@@ -117,7 +117,7 @@ namespace Tapbeatbox.TapLibrary
             for (int i = 0; i < 3; i++)
             {
                 parms[i] = (readings[i] - lastValues[i]) * 10;
-                parms[i + 3] = (readings[i] - lastValues[i])*(readings[(i+1)%3] - lastValues[(i + 1) % 3]) * 10;
+               // parms[i + 3] = (readings[i] - lastValues[i])*(readings[(i+1)%3] - lastValues[(i + 1) % 3]) * 10;
             }
             
             return parms;

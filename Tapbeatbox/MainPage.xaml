@@ -23,7 +23,7 @@
                     </StackPanel>
 
                         <!--Tone-->
-                    <ComboBox x:Name="SlotSettings_Tone" Header="Tone"  DropDownClosed="SlotSettings_Tone_Holding" Margin="10" Height="64" Width="200"  HorizontalAlignment="Center"
+                    <ComboBox x:Name="SlotSettings_Tone" Header="Tone"   DropDownClosed="SlotSettings_Tone_Holding" Margin="10" Height="64" Width="200"  HorizontalAlignment="Center"
           ItemsSource="{x:Bind listOfToneNames}" />
 
                         <!--Volume-->
@@ -106,7 +106,7 @@
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal" Padding="5">
-                        <Image Stretch="UniformToFill" Source="Assets/StoreLogo.png" Margin="10"/>
+                        <Image Stretch="UniformToFill" Source="Assets/toneIcon.png" Margin="10" Height="50" Width="50"/>
                         <StackPanel Orientation="Vertical">
                                 <TextBlock Text="{Binding Name}" FontSize="24"  TextWrapping="NoWrap"/>
                                 <StackPanel Orientation="Horizontal">

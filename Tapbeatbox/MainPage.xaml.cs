@@ -125,17 +125,27 @@ namespace Tapbeatbox
             {
                 if (item.ID == selectedSlotId)
                 {
-                    item.Name = SlotSettings_Name.Text;
-                    item.ToneName = SlotSettings_Tone.SelectedItem as string;
-                    item.Volume = (int)SlotSettings_Volume.SelectedItem;
-                    contentManager.SaveSlotItem(i);
+
+                    try
+                    {
+                        item.Name = SlotSettings_Name.Text;
+                        item.ToneName = SlotSettings_Tone.SelectedItem as string;
+                        item.Volume = (int)SlotSettings_Volume.SelectedItem;
+                        contentManager.SaveSlotItem(i);
+                    }
+                    catch(Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine("Error in saving Data");
+                        System.Diagnostics.Debug.WriteLine(ex);
+                    }
                     break;
                 }
                 i++;
             }
 
+
             // if the Popup is open, then close it 
-            if (SlotSettings.IsOpen) { SlotSettings.IsOpen = false; }
+            if (SlotSettings.IsOpen && e!=null) { SlotSettings.IsOpen = false; }
         }
 
 
@@ -347,7 +357,10 @@ namespace Tapbeatbox
         private void SlotSettings_Tone_Holding(object sender, object e)
         {
 
+            SaveSlotSettings(null, null);
             mediaManager.Play((string)SlotSettings_Tone.SelectedValue);
         }
+
+        
     }
 }

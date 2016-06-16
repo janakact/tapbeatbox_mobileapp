@@ -13,14 +13,14 @@ namespace Tapbeatbox
         public const int minVolume = 0; //Minimum possible volume
 
         public const double valueGap = 0.005; //Value gap which detect as a tap - this is a sensitivity value
-        public static TimeSpan timeGap = new TimeSpan(0, 0, 0, 0, 100); //mimimum required time gap to detect as two taps
+        public static TimeSpan timeGap = new TimeSpan(0, 0, 0, 0, 200); //mimimum required time gap to detect as two taps
 
-        public const int parmCount = 6;
+        public const int parmCount = 3;
         public const int trainingTapCount = 10;
 
-        public const int neuralNetFeedCount = 1000;
+        public const int neuralNetFeedCount = 2000;
         public const string networkURI = "http://tapbeatbox-globalgoals.rhcloud.com/rest/data/add";
 
-        public const int mediaCount = 4;
+        public const int mediaCount = 3;
     }
 }
